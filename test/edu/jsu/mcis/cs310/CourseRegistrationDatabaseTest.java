@@ -1,5 +1,6 @@
 package edu.jsu.mcis.cs310;
 
+import java.sql.SQLException;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.json.simple.*;
@@ -215,7 +216,7 @@ public class CourseRegistrationDatabaseTest {
     }
     
     @Test
-    public void testGetSections() {
+    public void testGetSections() throws SQLException {
         
         JSONArray r6 = (JSONArray)JSONValue.parse(s6);
         JSONArray r7 = (JSONArray)JSONValue.parse(s7);

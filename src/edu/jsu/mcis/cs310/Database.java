@@ -20,54 +20,119 @@ public class Database {
     
     /* PUBLIC METHODS */
 
-    public String getSectionsAsJSON(int termid, String subjectid, String num) {
-        
+    public String getSectionsAsJSON(int termid, String subjectid, String num) throws SQLException{ 
+    
         String result = null;
         
-        // INSERT YOUR CODE HERE
-        
+        try 
+        {
+            String query= "Select * FROM section WHERE termid=? AND subjectid=? AND num=?;";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+         
+            pstmt.setInt(1,termid);
+            pstmt.setString(2,subjectid);
+            pstmt.setString(3,num);
+
+            boolean hasresults = pstmt.execute();
+
+            if (hasresults)
+            {
+                ResultSet resultset = pstmt.getResultSet(); 
+                result = getResultSetAsJSON((ResultSet) resultset);
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }  
         return result;
-        
-    }
+    } 
+    
+    
     
     public int register(int studentid, int termid, int crn) {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
+        try
+        {
+            
+            String query = "INSERT INTO registration (studentid, termid, crn) VALUES (?,?,?);";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            
+            pstmt.setInt(1,studentid);
+            pstmt.setInt(2,termid);
+            pstmt.setInt(3,crn);
+
+            result = pstmt.executeUpdate();
+         } 
         
-        return result;
-        
+        catch (Exception e) { e.printStackTrace(); }        
+        return result;       
     }
 
     public int drop(int studentid, int termid, int crn) {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
+        try
+        {
+            
+            String query= "DELETE FROM registration WHERE studentid=? And termid=? And crn=?;";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            
+            pstmt.setInt(1,studentid);
+            pstmt.setInt(2,termid);
+            pstmt.setInt(3,crn);
+
         
+            result = pstmt.executeUpdate();
+       }
+
+        catch (Exception e) { e.printStackTrace(); } 
         return result;
-        
     }
+        
+    
     
     public int withdraw(int studentid, int termid) {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
-        
+        try
+        {
+            
+            String query = "DELETE FROM registration WHERE studentid=? AND termid=?;";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+            
+            pstmt.setInt(1,studentid);
+            pstmt.setInt(2,termid);
+
+            result=pstmt.executeUpdate();
+        }
+        catch (Exception e) { e.printStackTrace(); } 
         return result;
-        
     }
+        
+    
     
     public String getScheduleAsJSON(int studentid, int termid) {
         
         String result = null;
         
-        // INSERT YOUR CODE HERE
-        
+        try
+        {
+            
+            String query = "SELECT * FROM registration JOIN section ON registration.crn = section.crn;";
+            PreparedStatement pstmt = connection.prepareStatement(query);
+
+            boolean hasresults = pstmt.execute();
+
+            if (hasresults)
+            {
+                ResultSet resultset = pstmt.getResultSet(); 
+                result = getResultSetAsJSON((ResultSet) resultset);
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); } 
         return result;
-        
     }
     
     public int getStudentId(String username) {
@@ -130,7 +195,7 @@ public class Database {
         
             try {
 
-                String url = "jdbc:mysql://" + a + "/jsu_sp22_v1?autoReconnect=true&useSSL=false&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=America/Chicago";
+                String url = "jdbc:mysql://" + a + "/jsu_sp22_v1?autoReconnect=true&useSSL=false&zeroDateTimeBehavior=EXCEPTION&serverTimezone=America/Chicago";
                 // System.err.println("Connecting to " + url + " ...");
 
                 c = DriverManager.getConnection(url, u, p);
